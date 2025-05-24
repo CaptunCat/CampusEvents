@@ -2,13 +2,35 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
     <h2>{{ title }}</h2>
-    <form method="POST">
+    <form method="POST" class="mt-4">
         {{ form.hidden_tag() }}
-        <p>{{ form.username.label }} {{ form.username() }}</p>
-        <p>{{ form.firstname.label }} {{ form.firstname() }}</p>
-        <p>{{ form.lastname.label }} {{ form.lastname() }}</p>
-        <p>{{ form.email.label }} {{ form.email() }}</p>
-        <p>{{ form.submit() }}</p>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control") }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.firstname.label(class="form-label") }}
+                {{ form.firstname(class="form-control") }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.lastname.label(class="form-label") }}
+                {{ form.lastname(class="form-control") }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control") }}
+            </div>
+        </div>
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
     </form>
     <a href="{{ url_for('admin_page') }}" class="btn btn-secondary">Back to Admin</a>
 {% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    <h2>{{ title }}</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>{{ form.username.label }} {{ form.username() }}</p>
+        <p>{{ form.firstname.label }} {{ form.firstname() }}</p>
+        <p>{{ form.lastname.label }} {{ form.lastname() }}</p>
+        <p>{{ form.email.label }} {{ form.email() }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <a href="{{ url_for('admin_page') }}" class="btn btn-secondary">Back to Admin</a>
+{% endblock %}

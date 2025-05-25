@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}All Event Attendance{% endblock %}
+{% block content %}
+    <h2>All Event Attendance</h2>
+    {% for item in event_attendance %}
+        <div class="mb-4">
+            <h4>{{ item.event.name }} ({{ item.total }} attending)</h4>
+            <p><strong>Date:</strong> {{ item.event.date.strftime('%Y-%m-%d') }} |
+               <strong>Location:</strong> {{ item.event.location }}</p>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attendee in item.attendees %}
+                    <tr>
+                        <td>{{ attendee.username }}</td>
+                        <td>{{ attendee.firstname }}</td>
+                        <td>{{ attendee.lastname }}</td>
+                        <td>{{ attendee.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+{% endblock %}

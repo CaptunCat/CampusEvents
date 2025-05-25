@@ -1,5 +1,38 @@
 {% extends "base.html" %}
 {% block title %}Users{% endblock %}
 {% block content %}
-    <h1>Welcome to the users page</h1>
+    <h2>Welcome, {{ session_username }}!</h2>
+    <h3>Available Events</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Registration</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td>{{ event.name }}</td>
+                <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ event.location }}</td>
+                <td>{{ event.description }}</td>
+                <td>
+                    {% if event.id in registrations %}
+                        <form action="{{ url_for('unregister_event', event_id=event.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-warning btn-sm">Unregister</button>
+                        </form>
+                    {% else %}
+                        <form action="{{ url_for('register_event', event_id=event.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-success btn-sm">Register</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

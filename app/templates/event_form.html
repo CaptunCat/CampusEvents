@@ -6,31 +6,31 @@
         {{ form.hidden_tag() }}
         <div class="row mb-3">
             <div class="col-md-6">
-                {{ form.username.label(class="form-label") }}
-                {{ form.username(class="form-control") }}
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control") }}
             </div>
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
-                {{ form.firstname.label(class="form-label") }}
-                {{ form.firstname(class="form-control") }}
+                {{ form.date.label(class="form-label") }}
+                {{ form.date(class="form-control") }}
             </div>
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
-                {{ form.lastname.label(class="form-label") }}
-                {{ form.lastname(class="form-control") }}
+                {{ form.location.label(class="form-label") }}
+                {{ form.location(class="form-control") }}
             </div>
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
-                {{ form.email.label(class="form-label") }}
-                {{ form.email(class="form-control") }}
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control") }}
             </div>
         </div>
         <div class="mb-3">
             {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
-    <a href="{{ url_for('login') }}" class="btn btn-secondary">Back to Login</a>
+    <a href="{{ url_for('events') }}" class="btn btn-secondary">Back to Events</a>
 {% endblock %}

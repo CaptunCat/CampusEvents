@@ -15,46 +15,52 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    {% if not session_username %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('register_user') }}">Register</a>
-                        </li>
-                    {% else %}
-                        {% if session.get('is_admin') %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('user') }}">User</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('admin_page') }}">Admin</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('events') }}">Events</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('attendance_all') }}">All Attendance</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('user') }}">User</a>
-                            </li>
-                        {% endif %}
-                        {% if session_username %}
-    <!-- ...other nav items... -->
-    <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-    </li>
-                        {% endif %}
-                    {% endif %}
-                </ul>
+    {% if not session_username %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register_user') }}">Register</a>
+        </li>
+    {% else %}
+        {% if session.get('is_admin') %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user') }}">User</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('admin_page') }}">Admin</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('events') }}">Events</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('attendance_all') }}">All Attendance</a>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user') }}">User</a>
+            </li>
+        {% endif %}
+    {% endif %}
+</ul>
+<ul class="navbar-nav ms-auto">
+    {% if session_username %}
+       <li class="nav-item">
+    <span class="navbar-text text-light me-2">
+        Signed in as <strong>{{ session_username }}</strong>
+    </span>
+</li>
+<li class="nav-item">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
+</li>
+    {% endif %}
+</ul>
             </div>
         </div>
     </nav>
@@ -63,6 +69,23 @@
     <div class="container mt-4">
         {% block content %}{% endblock %}
     </div>
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to logout?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

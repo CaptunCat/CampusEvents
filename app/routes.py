@@ -1,12 +1,16 @@
 from app import app, db
-from app.models import User
 from app.forms import UserForm
-from flask import render_template, redirect, url_for, request, session, flash
-from app.models import Event, Registration
+from flask import render_template, redirect, url_for, request, session, flash, abort
+from app.models import Event, Registration, Category, User
 from app.forms import EventForm, LoginForm
+from datetime import date
 
-
-# filepath: c:\CampusEvents\app\routes.py
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'register_user', 'static']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect(url_for('login'))
+    
 @app.context_processor
 def inject_username():
     return dict(session_username=session.get('username'))
@@ -21,10 +25,20 @@ def user():
         flash('Please log in to view events.', 'warning')
         return redirect(url_for('login'))
     user = User.query.filter_by(username=session['username']).first()
-    events = Event.query.all()
-    # Assuming you have a Registration model with user_id and event_id
+    selected_category = request.args.get('category', 'all')
+    categories = Category.query.order_by(Category.name).all()
+    if selected_category == 'all':
+        events = Event.query.order_by(Event.date, Event.name).all()
+    else:
+        events = Event.query.filter_by(category_id=int(selected_category)).order_by(Event.date, Event.name).all()
     registrations = {reg.event_id for reg in user.registrations}
-    return render_template('users.html', events=events, registrations=registrations)
+    return render_template(
+        'users.html',
+        events=events,
+        registrations=registrations,
+        categories=categories,
+        selected_category=selected_category
+    )
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
@@ -98,13 +112,18 @@ def events():
 
 @app.route('/events/add', methods=['GET', 'POST'])
 def add_event():
+    if not session.get('is_admin'):
+        abort(403)
     form = EventForm()
+    # Populate category choices
+    form.category_id.choices = [(c.id, c.name) for c in Category.query.order_by(Category.name).all()]
     if form.validate_on_submit():
         event = Event(
             name=form.name.data,
             date=form.date.data,
             location=form.location.data,
-            description=form.description.data
+            description=form.description.data,
+            category_id=form.category_id.data
         )
         db.session.add(event)
         db.session.commit()
@@ -113,23 +132,36 @@ def add_event():
 
 @app.route('/events/edit/<int:event_id>', methods=['GET', 'POST'])
 def edit_event(event_id):
+    if not session.get('is_admin'):
+        abort(403)
     event = Event.query.get_or_404(event_id)
     form = EventForm(obj=event)
+    # Populate category choices
+    form.category_id.choices = [(c.id, c.name) for c in Category.query.order_by(Category.name).all()]
     if form.validate_on_submit():
         event.name = form.name.data
         event.date = form.date.data
         event.location = form.location.data
         event.description = form.description.data
+        event.category_id = form.category_id.data
         db.session.commit()
         return redirect(url_for('events'))
     return render_template('event_form.html', form=form, title="Edit Event")
 
 @app.route('/events/delete/<int:event_id>', methods=['POST'])
 def delete_event(event_id):
+    if not session.get('is_admin'):
+        abort(403)
     event = Event.query.get_or_404(event_id)
     db.session.delete(event)
     db.session.commit()
     return redirect(url_for('events'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -138,6 +170,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             session['username'] = user.username
+            session['is_admin'] = user.is_admin  # Add this line
             flash('Login successful!', 'success')
             return redirect(url_for('user'))
         else:

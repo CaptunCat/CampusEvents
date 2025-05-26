@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, TextAreaField
+from wtforms import StringField, SubmitField, DateField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Email, Length
 
 class UserForm(FlaskForm):
@@ -13,6 +13,7 @@ class EventForm(FlaskForm):
     name = StringField('Event Name', validators=[DataRequired()])
     date = DateField('Date', validators=[DataRequired()])
     location = StringField('Location', validators=[DataRequired()])
+    category_id = SelectField('Category', coerce=int, validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 

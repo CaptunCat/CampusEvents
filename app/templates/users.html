@@ -3,12 +3,25 @@
 {% block content %}
     <h2>Welcome, {{ session_username }}!</h2>
     <h3>Available Events</h3>
+    <form method="get" class="mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="all" {% if selected_category == 'all' %}selected{% endif %}>All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category|int == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Date</th>
                 <th>Location</th>
+                <th>Category</th>
                 <th>Description</th>
                 <th>Registration</th>
             </tr>
@@ -19,6 +32,7 @@
                 <td>{{ event.name }}</td>
                 <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
                 <td>{{ event.location }}</td>
+                <td>{{ event.category.name if event.category else 'Uncategorized' }}</td>
                 <td>{{ event.description }}</td>
                 <td>
                     {% if event.id in registrations %}

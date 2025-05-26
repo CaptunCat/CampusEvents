@@ -9,6 +9,7 @@
                 <th>Name</th>
                 <th>Date</th>
                 <th>Location</th>
+                <th>Category</th>
                 <th>Description</th>
                 <th>Actions</th>
             </tr>
@@ -19,6 +20,7 @@
                 <td>{{ event.name }}</td>
                 <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
                 <td>{{ event.location }}</td>
+                <td>{{ event.category.name if event.category else 'Uncategorized' }}</td>
                 <td>{{ event.description }}</td>
                 <td>
                     <a href="{{ url_for('edit_event', event_id=event.id) }}" class="btn btn-primary btn-sm">Edit</a>

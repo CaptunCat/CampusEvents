@@ -216,3 +216,36 @@ def attendance_all():
             'total': len(attendees)
         })
     return render_template('attendance_all.html', event_attendance=event_attendance)
+
+@app.route('/schema')
+def schema():
+    # Import models here to ensure latest definitions are used
+    from app.models import User, Event, Registration, Category
+
+    models = [User, Event, Registration, Category]
+    schema_info = []
+
+    for model in models:
+        columns = []
+        for col in model.__table__.columns:
+            columns.append({
+                'name': col.name,
+                'type': str(col.type),
+                'primary_key': col.primary_key,
+                'nullable': col.nullable,
+                'unique': col.unique,
+            })
+        # Gather relationships for this model
+        rels = []
+        for rel in model.__mapper__.relationships:
+            rels.append({
+                'name': rel.key,
+                'target': rel.mapper.class_.__name__,
+                'direction': str(rel.direction)
+            })
+        schema_info.append({
+            'model': model.__name__,
+            'columns': columns,
+            'relationships': rels
+        })
+    return render_template('schema.html', schema_info=schema_info)

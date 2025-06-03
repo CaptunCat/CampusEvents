@@ -1,0 +1,163 @@
+<!-- filepath: c:\Users\John\projects\EventRegistration\app\templates\schema.html -->
+{% extends "base.html" %}
+{% block title %}Database Schema{% endblock %}
+{% block content %}
+<h2>Database Schema</h2>
+
+<!-- Table of Contents with "All" tab -->
+<ul class="nav nav-pills mb-3" id="schemaTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="tab-All" data-bs-toggle="tab" data-bs-target="#All-tab" type="button" role="tab" aria-controls="All-tab" aria-selected="true">
+      All
+    </button>
+  </li>
+  {% for table in schema_info %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab-{{ table.model }}" data-bs-toggle="tab" data-bs-target="#{{ table.model }}-tab" type="button" role="tab" aria-controls="{{ table.model }}-tab" aria-selected="false">
+        {{ table.model }}
+      </button>
+    </li>
+  {% endfor %}
+</ul>
+
+<div class="tab-content" id="schemaTabContent">
+  <!-- All Tables Tab -->
+  <div class="tab-pane fade show active" id="All-tab" role="tabpanel" aria-labelledby="tab-All">
+    {% for table in schema_info %}
+      <div class="card mb-4" id="{{ table.model }}">
+        <div class="card-header">
+          <strong>{{ table.model }}</strong>
+        </div>
+        <div class="card-body">
+          <h5>Columns</h5>
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead>
+                <tr>
+                  <th>Column</th>
+                  <th>Type</th>
+                  <th data-bs-toggle="tooltip" title="Primary Key">PK</th>
+                  <th data-bs-toggle="tooltip" title="Nullable">Nullable</th>
+                  <th data-bs-toggle="tooltip" title="Unique">Unique</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for col in table.columns %}
+                <tr>
+                  <td>{{ col.name }}</td>
+                  <td>{{ col.type }}</td>
+                  <td>
+                    {% if col.primary_key %}
+                      <span class="badge bg-success">Yes</span>
+                    {% else %}
+                      <span class="badge bg-secondary">No</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if col.nullable %}
+                      <span class="badge bg-warning text-dark">Yes</span>
+                    {% else %}
+                      <span class="badge bg-secondary">No</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if col.unique %}
+                      <span class="badge bg-info text-dark">Yes</span>
+                    {% else %}
+                      <span class="badge bg-secondary">No</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if table.relationships %}
+          <h5>Relationships</h5>
+          <ul class="list-group">
+            {% for rel in table.relationships %}
+              <li class="list-group-item">
+                <strong>{{ rel.name }}</strong> → {{ rel.target }} <span class="text-muted">({{ rel.direction }})</span>
+              </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <!-- Individual Table Tabs -->
+  {% for table in schema_info %}
+  <div class="tab-pane fade" id="{{ table.model }}-tab" role="tabpanel" aria-labelledby="tab-{{ table.model }}">
+    <div class="card mb-4" id="{{ table.model }}">
+      <div class="card-header">
+        <strong>{{ table.model }}</strong>
+      </div>
+      <div class="card-body">
+        <h5>Columns</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead>
+              <tr>
+                <th>Column</th>
+                <th>Type</th>
+                <th data-bs-toggle="tooltip" title="Primary Key">PK</th>
+                <th data-bs-toggle="tooltip" title="Nullable">Nullable</th>
+                <th data-bs-toggle="tooltip" title="Unique">Unique</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for col in table.columns %}
+              <tr>
+                <td>{{ col.name }}</td>
+                <td>{{ col.type }}</td>
+                <td>
+                  {% if col.primary_key %}
+                    <span class="badge bg-success">Yes</span>
+                  {% else %}
+                    <span class="badge bg-secondary">No</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if col.nullable %}
+                    <span class="badge bg-warning text-dark">Yes</span>
+                  {% else %}
+                    <span class="badge bg-secondary">No</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if col.unique %}
+                    <span class="badge bg-info text-dark">Yes</span>
+                  {% else %}
+                    <span class="badge bg-secondary">No</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if table.relationships %}
+        <h5>Relationships</h5>
+        <ul class="list-group">
+          {% for rel in table.relationships %}
+            <li class="list-group-item">
+              <strong>{{ rel.name }}</strong> → {{ rel.target }} <span class="text-muted">({{ rel.direction }})</span>
+            </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Enable Bootstrap tooltips -->
+<script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+</script>
+{% endblock %}

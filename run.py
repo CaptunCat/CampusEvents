@@ -24,6 +24,12 @@ def seed_db_if_empty():
             User(username="carol", firstname="Carol", lastname="Lee", email="carol@example.com"),
             User(username="dave", firstname="Dave", lastname="Kim", email="dave@example.com"),
         ]
+        # Set passwords
+        for user in users:
+            if user.username == "admin":
+                user.set_password("admin")
+            else:
+                user.set_password("pass")
         db.session.add_all(users)
         db.session.commit()
 
@@ -76,26 +82,26 @@ def seed_db_if_empty():
             "Thinking about grad school? Attend this info session to learn about programs, applications, and funding opportunities. Meet current grad students and faculty."
         ]
         event_locations = [
-        "Main Soccer Field",
-        "Campus Auditorium",
-        "Computer Lab 1",
-        "Art Studio A",
-        "Conference Center",
-        "Basketball Gym",
-        "Music Hall",
-        "Tech Expo Center",
-        "Photography Studio",
-        "Career Services Room",
-        "Volleyball Court",
-        "Student Union Ballroom",
-        "Innovation Lab",
-        "Central Park Lawn",
-        "Internship Office",
-        "Athletics Track",
-        "Coffeehouse",
-        "Web Lab",
-        "Sculpture Garden",
-        "Graduate Studies Office"
+            "Main Soccer Field",
+            "Campus Auditorium",
+            "Computer Lab 1",
+            "Art Studio A",
+            "Conference Center",
+            "Basketball Gym",
+            "Music Hall",
+            "Tech Expo Center",
+            "Photography Studio",
+            "Career Services Room",
+            "Volleyball Court",
+            "Student Union Ballroom",
+            "Innovation Lab",
+            "Central Park Lawn",
+            "Internship Office",
+            "Athletics Track",
+            "Coffeehouse",
+            "Web Lab",
+            "Sculpture Garden",
+            "Graduate Studies Office"
         ]
         events = []
         for i in range(20):
@@ -103,7 +109,7 @@ def seed_db_if_empty():
             events.append(Event(
                 name=event_names[i],
                 date=date.today() + timedelta(days=i),
-                location=event_locations[i],  # <-- Use the unique location here!
+                location=event_locations[i],
                 description=event_descriptions[i],
                 category_id=cat.id
             ))

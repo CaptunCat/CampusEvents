@@ -50,9 +50,10 @@ def register_user():
             lastname=form.lastname.data,
             email=form.email.data
         )
+        user.set_password(form.password.data)  # <-- Hash the password
         db.session.add(user)
         db.session.commit()
-        flash('Account created! Please log in.', 'success')
+        flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('login'))
     return render_template('user_form.html', form=form, title="Register")
 
@@ -168,13 +169,13 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user:
+        if user and user.check_password(form.password.data):
             session['username'] = user.username
-            session['is_admin'] = user.is_admin  # Add this line
-            flash('Login successful!', 'success')
-            return redirect(url_for('user'))
+            session['is_admin'] = user.is_admin
+            flash('Logged in successfully!', 'success')
+            return redirect(url_for('home'))
         else:
-            flash('Username not found.', 'danger')
+            flash('Invalid username or password.', 'danger')
     return render_template('login.html', form=form, title="Login")
 
 @app.route('/register_event/<int:event_id>', methods=['POST'])

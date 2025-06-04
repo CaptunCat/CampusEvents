@@ -12,15 +12,19 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
-    <form method="POST" class="mt-4">
-        {{ form.hidden_tag() }}
-        <div class="mb-3 col-md-4">
-            {{ form.username.label(class="form-label") }}
-            {{ form.username(class="form-control") }}
-        </div>
-        <div class="mb-3">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
-    </form>
+<form method="POST" class="mt-4">
+    {{ form.hidden_tag() }}
+    <div class="mb-4 col-md-4">
+        {{ form.username.label(class="form-label") }}
+        {{ form.username(class="form-control form-control") }}
+    </div>
+    <div class="mb-4 col-md-4">
+        {{ form.password.label(class="form-label") }}
+        {{ form.password(class="form-control form-control") }}
+    </div>
+    <div class="mb-3 col-md-4">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
     <a href="{{ url_for('register_user') }}" class="btn btn-secondary mt-2">Make an Account</a>
 {% endblock %}

@@ -1,58 +1,147 @@
 {% extends "base.html" %}
 {% block title %}Users{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+{% endblock %}
 {% block content %}
-    <h2>Welcome, {{ current_user.username }}!</h2>
-    <h3>Available Events</h3>
-    <form method="get" class="mb-3">
-        <div class="row">
-            <div class="col-md-4">
-                <select name="category" class="form-select" onchange="this.form.submit()">
-                    <option value="all" {% if selected_category == 'all' %}selected{% endif %}>All Categories</option>
-                    {% for cat in categories %}
-                        <option value="{{ cat.id }}" {% if selected_category|int == cat.id %}selected{% endif %}>{{ cat.name }}</option>
-                    {% endfor %}
-                </select>
+<div class="row">
+    <div class="col-md-7">
+        <h2>Welcome, {{ current_user.username }}!</h2>
+        <h3>Available Events</h3>
+        <form method="get" class="mb-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <select name="category" class="form-select" onchange="this.form.submit()">
+                        <option value="all" {% if selected_category == 'all' %}selected{% endif %}>All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if selected_category|int == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}" onchange="this.form.submit()" placeholder="Start date">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}" onchange="this.form.submit()" placeholder="End date">
+                </div>
             </div>
-            <div class="col-md-3">
-                <input type="date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}" onchange="this.form.submit()" placeholder="Start date">
-            </div>
-            <div class="col-md-3">
-                <input type="date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}" onchange="this.form.submit()" placeholder="End date">
-            </div>
+        </form>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Registration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.name }}</td>
+                    <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ event.location }}</td>
+                    <td>{{ event.category.name if event.category else 'Uncategorized' }}</td>
+                    <td>{{ event.description }}</td>
+                    <td>
+                        {% if event.id in registrations %}
+                            <form action="{{ url_for('unregister_event', event_id=event.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-warning btn-sm">Unregister</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('register_event', event_id=event.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-success btn-sm">Register</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-5">
+        <div id="calendar" style="background: #fff; min-height: 400px;"></div>
+        <!-- My Registered Events Section -->
+        <div class="mt-4">
+            <h4>My Registered Events</h4>
+            {% set my_events = events|selectattr("id", "in", registrations)|list %}
+            {% if my_events %}
+            <ul class="list-group">
+                {% for event in my_events %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ event.name }}</strong>
+                        <span class="text-muted">({{ event.date.strftime('%Y-%m-%d') }})</span><br>
+                        <small>{{ event.location }}</small>
+                    </div>
+                    <form action="{{ url_for('unregister_event', event_id=event.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-warning btn-sm">Unregister</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="text-muted">You have not registered for any events.</div>
+            {% endif %}
         </div>
-    </form>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Registration</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for event in events %}
-            <tr>
-                <td>{{ event.name }}</td>
-                <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
-                <td>{{ event.location }}</td>
-                <td>{{ event.category.name if event.category else 'Uncategorized' }}</td>
-                <td>{{ event.description }}</td>
-                <td>
-                    {% if event.id in registrations %}
-                        <form action="{{ url_for('unregister_event', event_id=event.id) }}" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-warning btn-sm">Unregister</button>
-                        </form>
-                    {% else %}
-                        <form action="{{ url_for('register_event', event_id=event.id) }}" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-success btn-sm">Register</button>
-                        </form>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    </div>
+</div>
+
+<!-- Event Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Name:</strong> <span id="modalEventName"></span></p>
+        <p><strong>Date:</strong> <span id="modalEventDate"></span></p>
+        <p><strong>Location:</strong> <span id="modalEventLocation"></span></p>
+        <p><strong>Description:</strong> <span id="modalEventDescription"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: 600,
+            events: [
+                {% for event in events %}
+                {
+                    title: {{ event.name|tojson }},
+                    start: "{{ event.date.isoformat() }}",
+                    description: {{ event.description|tojson }},
+                    location: {{ event.location|tojson }}
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                document.getElementById('modalEventName').textContent = info.event.title;
+                document.getElementById('modalEventDate').textContent = info.event.start.toISOString().slice(0,10);
+                document.getElementById('modalEventLocation').textContent = info.event.extendedProps.location || '';
+                document.getElementById('modalEventDescription').textContent = info.event.extendedProps.description || '';
+                var modal = new bootstrap.Modal(document.getElementById('eventModal'));
+                modal.show();
+            }
+        });
+        calendar.render();
+    });
+    </script>
 {% endblock %}

@@ -66,31 +66,27 @@ def user():
     events = query.order_by(Event.date, Event.name).all()
     registrations = {reg.event_id for reg in current_user.registrations}
 
+    calendar_events = [
+        {
+            "title": event.name,
+            "start": event.date.strftime("%Y-%m-%d"),
+            "description": event.description,
+            "location": event.location,
+            "category": event.category.name if event.category else "Uncategorized"
+        }
+        for event in events
+    ]
+
     return render_template(
         'users.html',
         user=current_user,
         events=events,
         registrations=registrations,
         categories=categories,
-        selected_category=selected_category
+        selected_category=selected_category,
+        calendar_events=calendar_events  # <-- Make sure this is included!
     )
 
-# @app.route('/register', methods=['GET', 'POST'])
-# def register_user():
-#     form = UserForm()
-#     if form.validate_on_submit():
-#         user = User(
-#             username=form.username.data,
-#             firstname=form.firstname.data,
-#             lastname=form.lastname.data,
-#             email=form.email.data
-#         )
-#         user.set_password(form.password.data)  # <-- Hash the password
-#         db.session.add(user)
-#         db.session.commit()
-#         flash('Registration successful! Please log in.', 'success')
-#         return redirect(url_for('login'))
-#     return render_template('user_form.html', form=form, title="Register")
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():

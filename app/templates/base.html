@@ -15,48 +15,51 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-    {% if not session_username %}
+    {% if not current_user.is_authenticated %}
         <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+            <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">Login</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('register_user') }}">Register</a>
+            <a class="nav-link {% if request.endpoint == 'register_user' %}active{% endif %}" href="{{ url_for('register_user') }}">Register</a>
         </li>
     {% else %}
-        {% if session.get('is_admin') %}
+        {% if current_user.is_admin %}
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('user') }}">User</a>
+                <a class="nav-link {% if request.endpoint == 'user' %}active{% endif %}" href="{{ url_for('user') }}">User</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('admin_page') }}">Admin</a>
+                <a class="nav-link {% if request.endpoint == 'admin_page' %}active{% endif %}" href="{{ url_for('admin_page') }}">Admin</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('events') }}">Events</a>
+                <a class="nav-link {% if request.endpoint == 'events' %}active{% endif %}" href="{{ url_for('events') }}">Events</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('attendance_all') }}">All Attendance</a>
+                <a class="nav-link {% if request.endpoint == 'events_calendar' %}active{% endif %}" href="{{ url_for('events_calendar') }}">Events Calendar</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('schema') }}">Schema</a>
+                <a class="nav-link {% if request.endpoint == 'attendance_all' %}active{% endif %}" href="{{ url_for('attendance_all') }}">All Attendance</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'schema' %}active{% endif %}" href="{{ url_for('schema') }}">Schema</a>
             </li>
         {% else %}
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('user') }}">User</a>
+                <a class="nav-link {% if request.endpoint == 'user' %}active{% endif %}" href="{{ url_for('user') }}">User</a>
             </li>
         {% endif %}
     {% endif %}
 </ul>
 <ul class="navbar-nav ms-auto">
-    {% if session_username %}
+    {% if current_user.is_authenticated %}
        <li class="nav-item">
     <span class="navbar-text text-light me-2">
-        Signed in as <strong>{{ session_username }}</strong>
+        Signed in as <strong>{{ current_user.username  }}</strong>
     </span>
 </li>
 <li class="nav-item">

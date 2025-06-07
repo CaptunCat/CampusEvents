@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
+from flask_login import LoginManager
 #from app.models import create_database
 
 
@@ -19,3 +20,11 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 from app import routes, models 
+from app.models import User
+
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))

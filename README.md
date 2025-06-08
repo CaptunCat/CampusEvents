@@ -15,3 +15,4 @@ CampusEvents
     Install dependencies: pip install -r requirements.txt
 
     Deactivate the virtual environment (when done): deactivate
+![image](https://github.com/user-attachments/assets/e72498af-9014-4e6a-b5d0-f66894cad93f)

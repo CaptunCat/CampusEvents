@@ -69,6 +69,26 @@
         </div>
     </nav>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <script>
+        // Auto-dismiss alerts after 3 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+            var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            bsAlert.close();
+            });
+        }, 4000);
+        </script>
+
     <!-- Page Content -->
     <div class="container mt-4">
         {% block content %}{% endblock %}

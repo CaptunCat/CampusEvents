@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="text-center mt-5">
+    <h1>Welcome to the Event Campus Management System</h1>
+    <p class="lead mt-3">
+        Discover, register, and manage campus events with ease.<br>
+        Log in or create an account to get started!
+    </p>
+    <div class="mt-4">
+        {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg me-2">Login</a>
+            <a href="{{ url_for('register_user') }}" class="btn btn-outline-secondary btn-lg">Register</a>
+        {% else %}
+            <a href="{{ url_for('user') }}" class="btn btn-success btn-lg">View Events</a>
+        {% endif %}
+    </div>
+    <hr class="my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming Events</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Soccer Tournament - June 10</li>
+                        <li class="list-group-item">Jazz Night - June 12</li>
+                        <li class="list-group-item">Python Bootcamp - June 15</li>
+                    </ul>
+                    <a href="{{ url_for('user') }}" class="btn btn-link mt-2">See all events</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Why Use This System?</h5>
+                    <ul>
+                        <li>Easy event registration</li>
+                        <li>Personal event dashboard</li>
+                        <li>Stay updated with campus activities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

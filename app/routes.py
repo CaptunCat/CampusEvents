@@ -5,20 +5,11 @@ from app.models import Event, Registration, Category, User
 from app.forms import EventForm, LoginForm
 from datetime import date
 from flask_login import login_user, logout_user, login_required, current_user
-
-# @app.before_request
-# def require_login():
-#     allowed_routes = ['login', 'register_user', 'static']
-#     if request.endpoint not in allowed_routes and 'username' not in session:
-#         return redirect(url_for('login'))
-    
-# @app.context_processor
-# def inject_username():
-#     return dict(session_username=session.get('username'))
+from math import ceil
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('home.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -132,7 +123,9 @@ def admin_page():
     if not current_user.is_admin:
         abort(403)
     users = User.query.all()
-    return render_template('admin.html', users=users)
+    categories = Category.query.all()
+    events = Event.query.all()
+    return render_template('admin.html', users=users, categories=categories, events=events)
 
 @app.route('/admin/add', methods=['GET', 'POST'])
 @login_required
@@ -178,7 +171,7 @@ def delete_user(user_id):
 @login_required
 def events():
     events = Event.query.all()
-    return render_template('events.html', events=events)
+    return render_template('admin.html', events=events)
 
 @app.route('/events/add', methods=['GET', 'POST'])
 @login_required
@@ -198,7 +191,7 @@ def add_event():
         )
         db.session.add(event)
         db.session.commit()
-        return redirect(url_for('events'))
+        return redirect(url_for('admin_page'))
     return render_template('event_form.html', form=form, title="Add Event")
 
 @app.route('/events/edit/<int:event_id>', methods=['GET', 'POST'])
@@ -217,7 +210,7 @@ def edit_event(event_id):
         event.description = form.description.data
         event.category_id = form.category_id.data
         db.session.commit()
-        return redirect(url_for('events'))
+        return redirect(url_for('admin_page'))
     return render_template('event_form.html', form=form, title="Edit Event")
 
 @app.route('/events/delete/<int:event_id>', methods=['POST'])
@@ -228,30 +221,7 @@ def delete_event(event_id):
     event = Event.query.get_or_404(event_id)
     db.session.delete(event)
     db.session.commit()
-    return redirect(url_for('events'))
-
-# @app.route('/logout')
-# @login_required
-# def logout():
-#     session.clear()
-#     flash('You have been logged out.', 'info')
-#     return redirect(url_for('login'))
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         user = User.query.filter_by(username=form.username.data).first()
-#         if user and user.check_password(form.password.data):
-#             session['username'] = user.username
-#             session['is_admin'] = user.is_admin
-#             flash('Logged in successfully!', 'success')
-#             return redirect(url_for('home'))
-#         else:
-#             flash('Invalid username or password.', 'danger')
-#     return render_template('login.html', form=form, title="Login")
-
-
+    return redirect(url_for('admin_page'))
 
 
 @app.route('/register_event/<int:event_id>', methods=['POST'])
@@ -277,7 +247,12 @@ def unregister_event(event_id):
 @app.route('/attendance_all')
 @login_required
 def attendance_all():
-    events = Event.query.all()
+    search = request.args.get('search', '').lower()
+    page = int(request.args.get('page', 1))
+    per_page = 8
+
+    # Build the event_attendance list
+    events = Event.query.order_by(Event.date.desc()).all()
     event_attendance = []
     for event in events:
         registrations = Registration.query.filter_by(event_id=event.id).all()
@@ -287,7 +262,27 @@ def attendance_all():
             'attendees': attendees,
             'total': len(attendees)
         })
-    return render_template('attendance_all.html', event_attendance=event_attendance)
+
+    # Filter by event name if search is provided
+    if search:
+        filtered = [item for item in event_attendance if search in item['event'].name.lower()]
+    else:
+        filtered = event_attendance
+
+    # Pagination
+    total = len(filtered)
+    total_pages = ceil(total / per_page) if total > 0 else 1
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated = filtered[start:end]
+
+    return render_template(
+        'attendance_all.html',
+        event_attendance=paginated,
+        page=page,
+        total_pages=total_pages,
+        search=search
+    )
 
 @app.route('/schema')
 @login_required
@@ -328,3 +323,31 @@ def schema():
 def events_calendar():
     events = Event.query.all()
     return render_template('events_calendar.html', events=events)
+
+# Add Category
+@app.route('/admin/add_category', methods=['POST'])
+def add_category():
+    name = request.form.get('category_name')
+    if name:
+        category = Category(name=name)
+        db.session.add(category)
+        db.session.commit()
+    return redirect(url_for('admin_page'))
+
+# Edit Category
+@app.route('/admin/edit_category/<int:category_id>', methods=['POST'])
+def edit_category(category_id):
+    category = Category.query.get_or_404(category_id)
+    name = request.form.get('category_name')
+    if name:
+        category.name = name
+        db.session.commit()
+    return redirect(url_for('admin_page'))
+
+# Delete Category
+@app.route('/admin/delete_category/<int:category_id>', methods=['POST'])
+def delete_category(category_id):
+    category = Category.query.get_or_404(category_id)
+    db.session.delete(category)
+    db.session.commit()
+    return redirect(url_for('admin_page'))

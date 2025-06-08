@@ -35,9 +35,6 @@
                 <a class="nav-link {% if request.endpoint == 'admin_page' %}active{% endif %}" href="{{ url_for('admin_page') }}">Admin</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'events' %}active{% endif %}" href="{{ url_for('events') }}">Events</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'events_calendar' %}active{% endif %}" href="{{ url_for('events_calendar') }}">Events Calendar</a>
             </li>
             <li class="nav-item">

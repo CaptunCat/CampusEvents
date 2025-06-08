@@ -1,15 +1,17 @@
-Clone the repository git clone <repository_url> cd <project_directory>
+CampusEvents
 
-Create a virtual environment: python -m venv venv
+    Clone the repository git clone <repository_url> cd <project_directory>
 
-Activate the virtual environment:
+    Create a virtual environment: python -m venv venv
 
-On Windows: venv\Scripts\activate
+    Activate the virtual environment:
 
-On Mac/Linux: source venv/bin/activate
+    On Windows: venv\Scripts\activate
 
-Upgrade pip (important to avoid outdated package issues): python -m pip install --upgrade pip
+    On Mac/Linux: source venv/bin/activate
 
-Install dependencies: pip install -r requirements.txt
+    Upgrade pip (important to avoid outdated package issues): python -m pip install --upgrade pip
 
-Deactivate the virtual environment (when done): deactivate
+    Install dependencies: pip install -r requirements.txt
+
+    Deactivate the virtual environment (when done): deactivate
